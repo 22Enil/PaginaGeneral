@@ -1,0 +1,46 @@
+{% load static %}
+<div class="container-fluid py-5" style="background-color: #faf6f2;">
+    <div class="row align-items-center">
+        <!-- Texto / Descripción -->
+        <div class="col-lg-6 px-5">
+            <h6 class="text-uppercase text-muted mb-3">Minimalist Collection V9</h6>
+            <h1 class="fw-bold display-5 mb-4">Watch<br>What's Next.</h1>
+            <p class="lead text-secondary mb-4">
+                Sé el primero en enterarte de los nuevos estilos. 
+                Relojes clásicos con cristal zafiro, acero inoxidable y correas elegantes. 
+                Una nueva forma de expresar lujo en un diseño minimalista.
+            </p>
+            <a href="#" class="btn btn-dark px-4 py-2 me-2">Explorar más</a>
+            <a href="#" class="btn btn-outline-dark px-4 py-2">Ver Catálogo</a>
+        </div>
+
+        <!-- Imagen principal / Carrusel -->
+        <div class="col-lg-6 position-relative text-center">
+            <!-- Imagen grande -->
+            <img src="{% static 'imgs/modelo_reloj.jpg' %}" 
+                 class="img-fluid rounded shadow" 
+                 alt="Modelo con reloj" style="max-height: 480px; object-fit: cover;">
+            
+            <!-- Imagen secundaria (superpuesta) -->
+            <div class="position-absolute bottom-0 end-0 m-4" style="width: 200px;">
+                <div class="card border-0 shadow">
+                    <img src="{% static 'imgs/reloj_closeup.jpg' %}" 
+                         class="card-img-top" 
+                         alt="Closeup del reloj">
+                    <div class="card-body p-2 text-center">
+                        <small class="text-muted">Classic R1</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección inferior con paginación estilo carrusel -->
+    <div class="row mt-5">
+        <div class="col text-center">
+            <span class="me-3 fw-bold">01/03</span>
+            <button class="btn btn-outline-dark btn-sm me-2">&lt;</button>
+            <button class="btn btn-outline-dark btn-sm">&gt;</button>
+        </div>
+    </div>
+</div>
