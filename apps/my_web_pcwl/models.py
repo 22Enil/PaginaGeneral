@@ -2,15 +2,16 @@ from django.db import models # Importa el módulo 'models' de Django para crear 
 # Create your models here.
 
 # Modelo Producto → representa una tabla con los productos
-class Productos(models.Model):
-    nombre = models.CharField(max_length=100)             # Campo de texto corto (nombre del producto)
-    descripcion = models.TextField(blank=True)            # Texto largo, puede quedar vacío
-    precio = models.DecimalField(max_digits=8, decimal_places=2)  # Precio con 2 decimales (ej. 199.99)
-    stock = models.PositiveIntegerField(default=0)        # Cantidad disponible (solo números positivos)
-    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)  # Fecha automática al crear el producto
+from django.db import models
+class Producto(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
+    disponible = models.BooleanField(default=True)
 
-    def __str__(self):                                    # Método que define cómo se mostrará el objeto como texto
-        return self.nombre                                # Al imprimir un producto, se verá su nombre
+    def __str__(self):
+        return self.nombre                               # Al imprimir un producto, se verá su nombre
 
 # Modelo Promocion → cada promoción pertenece a un producto
 class Promocion(models.Model):
