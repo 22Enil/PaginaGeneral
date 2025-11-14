@@ -3,7 +3,7 @@ from django.db import models # Importa el módulo 'models' de Django para crear 
 
 # Modelo Producto → representa una tabla con los productos
 from django.db import models
-class Producto(models.Model):
+class Productos(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)

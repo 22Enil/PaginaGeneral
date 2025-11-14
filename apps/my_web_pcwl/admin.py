@@ -3,7 +3,6 @@ from django.contrib import admin
 # Register your models here.
 from .models import Productos, Promocion
 
-#Prueba
 
 @admin.register(Productos)
 class ProductoAdmin(admin.ModelAdmin):
