@@ -89,3 +89,21 @@ class ContactView(View):
     def get(self, request, *args, **kwargs):
         context_html = {}
         return render(request, self.template_name, context_html)
+    
+
+from rest_framework import generics, permissions
+from .models import Articulo
+from .serializers import ArticuloSerializer
+
+class ArticuloListCreate(generics.ListCreateAPIView):
+    queryset = Articulo.objects.all()
+    serializer_class = ArticuloSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class ArticuloDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Articulo.objects.all()
+    serializer_class = ArticuloSerializer
+    permission_classes = [permissions.IsAuthenticated]

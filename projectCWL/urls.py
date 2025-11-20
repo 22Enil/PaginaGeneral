@@ -21,4 +21,5 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("apps.my_web_pcwl.urls")),  # incluimos urls de la app
+    path("api/", include("apps.my_web_pcwl.urls_api")),  # API separada
 ]
