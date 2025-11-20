@@ -30,3 +30,11 @@ class Promocion(models.Model):
     def __str__(self):                   # Representación legible del objeto Promocion
         # Muestra el nombre del producto y el porcentaje de descuento
         return f"Promoción de {self.producto.nombre} ({self.descuento}%)"
+    
+
+from django.conf import settings
+class Articulo(models.Model):
+    titulo = models.CharField(max_length=200)
+    contenido = models.TextField()
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    creado = models.DateTimeField(auto_now_add=True)
