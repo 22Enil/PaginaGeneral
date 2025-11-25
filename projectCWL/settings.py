@@ -132,9 +132,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 # Archivos estáticos
-#STATIC_URL = '/static/' probar y borrar
+# Ruta donde `collectstatic` colocará los archivos para producción
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
     BASE_DIR / "apps" / "static",   # Carpeta global de estáticos
