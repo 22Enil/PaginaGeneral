@@ -9,3 +9,4 @@ class PruebasBasicas(TestCase):
         resultado = sumar(2, 3)
         self.assertEqual(resultado, 5)
 
+# Esto es un cambio de prueba
