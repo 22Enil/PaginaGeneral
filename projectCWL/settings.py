@@ -132,9 +132,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 # Archivos estáticos
-#STATIC_URL = '/static/' probar y borrar
+# Usar una ruta absoluta para `STATIC_URL` evita que el navegador resuelva rutas
+# relativas desde rutas como `/admin/` (evita `/admin/static/...` en vez de `/static/...`).
+# `STATIC_ROOT` es la carpeta de destino usada por `collectstatic` en producción.
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
     BASE_DIR / "apps" / "static",   # Carpeta global de estáticos
@@ -174,3 +177,6 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
