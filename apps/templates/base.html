@@ -35,9 +35,19 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Servicios</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contacto</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Ingresar</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Nuevo Usuario</a></li>
-                    <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+
+                    {# Mostrar enlaces según estado de autenticación #}
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Ingresar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Registrate</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
