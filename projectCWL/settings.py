@@ -134,12 +134,19 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 # Archivos estáticos
-# Ruta donde `collectstatic` colocará los archivos para producción
+# Usar una ruta absoluta para `STATIC_URL` evita que el navegador resuelva rutas
+# relativas desde rutas como `/admin/` (evita `/admin/static/...` en vez de `/static/...`).
+# `STATIC_ROOT` es la carpeta de destino usada por `collectstatic` en producción.
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
     BASE_DIR / "apps" / "static",   # Carpeta global de estáticos
 ]
+# Media (archivos subidos por usuarios)
+# Las URLs de `ImageField` y otros archivos subidos usan `MEDIA_URL`.
+# En desarrollo servimos estos archivos desde `MEDIA_ROOT` mediante `urlpatterns += static(...)`.
+# Nota: la definición final de `MEDIA_URL`/`MEDIA_ROOT` (usando `os.path.join`) se encuentra al final
+# del archivo para respetar la convención original del proyecto.
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -175,3 +182,6 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
