@@ -142,11 +142,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "apps" / "static",   # Carpeta global de estáticos
 ]
-# Media (archivos subidos por usuarios)
-# Las URLs de `ImageField` y otros archivos subidos usan `MEDIA_URL`.
-# En desarrollo servimos estos archivos desde `MEDIA_ROOT` mediante `urlpatterns += static(...)`.
-# Nota: la definición final de `MEDIA_URL`/`MEDIA_ROOT` (usando `os.path.join`) se encuentra al final
-# del archivo para respetar la convención original del proyecto.
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

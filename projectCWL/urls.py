@@ -19,11 +19,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-# Nota: En desarrollo (`DEBUG = True`) añadimos `static()` para que Django
-# sirva archivos estáticos y de medios directamente. Esto NO debe usarse
-# en producción: en producción los archivos estáticos y media deben ser
-# servidos por WhiteNoise o por el servidor web (nginx, apache, etc.).
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("apps.my_web_pcwl.urls")),  # incluimos urls de la app
