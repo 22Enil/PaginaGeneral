@@ -107,3 +107,34 @@ class ArticuloDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Articulo.objects.all()
     serializer_class = ArticuloSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+##Serializers
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import Articulo
+from .serializers import (
+    ArticuloSerializer,
+    ArticuloSerializerPretty,
+    ArticuloSerializerAll
+)
+
+class ArticuloViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    # Mapear serializers según "modo"
+    serializers_map = {
+        'basic': ArticuloSerializer,
+        'pretty': ArticuloSerializerPretty,
+        'all': ArticuloSerializerAll,
+    }
+
+    def get_serializer_class(self):
+        modo = self.kwargs.get('modo', 'basic')  # 'basic' por default
+        return self.serializers_map.get(modo, ArticuloSerializer)
+
+    def get_queryset(self):
+        return Articulo.objects.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
