@@ -12,6 +12,8 @@ class Productos(models.Model):
     stock = models.PositiveIntegerField(default=0)        # Cantidad disponible (solo números positivos)
     fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)  # Fecha automática al crear el producto
 
+    imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
+
     def __str__(self):                                    # Método que define cómo se mostrará el objeto como texto
         return self.nombre                                # Al imprimir un producto, se verá su nombre
 
