@@ -1,21 +1,15 @@
-from django.shortcuts import render, redirect #en automatico
-# Create your views here.
-#1
+from django.shortcuts import render, redirect
 from django.views import View
-#2
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-#3
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-#4
 from django.http import JsonResponse
-from .models import PerfilUsuario
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from .forms import ProfileForm
 
+# Importas tus modelos y formularios juntos
+from .models import PerfilUsuario, Productos, Articulo 
+from .forms import ProfileForm
 
 @method_decorator(login_required(login_url='login'), name='dispatch')
 class PerfilView(View):
@@ -46,9 +40,13 @@ class Dashboard(View):
     template_name = "base.html"
 
     def get(self, request, *args, **kwargs):
+        # 1. Traer productos
+        # Usamos .all() para que traiga todo (con o sin foto) y descartar problemas de filtro
+        productos = Productos.objects.filter(imagen__isnull=False).exclude(imagen='').order_by('-id')[:5]        
         nombre = "Enil"
         context_html = {
-            "nombre_usuario": nombre
+            "nombre_usuario": nombre,
+            "productos": productos  # <--- Esta línea es la que llena el carrusel
         }
         return render(request, self.template_name, context_html)
 
@@ -58,9 +56,12 @@ class IndexView(View):
     template_name = "pcwl/index.html"
 
     def get(self, request, *args, **kwargs):
-        context_html = {}
+        # 1. Traer productos
+        productos = Productos.objects.filter(imagen__isnull=False).exclude(imagen='').order_by('-id')[:5]
+        context_html = {
+            "productos": productos
+        }
         return render(request, self.template_name, context_html)
-
 # Login - Iniciar session
 class LoginView(View):
     template_name = "pcwl/login.html"
