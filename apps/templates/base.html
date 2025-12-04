@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}My Page{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'imagenes/dodgers.png' %}">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
@@ -35,9 +36,19 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Servicios</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contacto</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Ingresar</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Nuevo Usuario</a></li>
-                    <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+
+                    {# Mostrar enlaces según estado de autenticación #}
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Ingresar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Registrate</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
@@ -46,11 +57,7 @@
     <!-- BODY -->
     <main>
         {% block content %}
-        <div class="container text-center">
-            <h1 class="text-primary">🚀 Welcome!!</h1>
-            <button class="btn btn-success">Botón Verde</button>
-            <button class="btn btn-danger">Botón Rojo</button>
-        </div>
+
 
         {% include "pcwl/content_base.html" %}
         {% endblock %}
