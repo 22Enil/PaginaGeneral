@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ producto.nombre }} - Detalle{% endblock %}
+
+{% block extra_css %}
+<style>
+    .producto-imagen-principal {
+        width: 100%;
+        height: 500px;
+        object-fit: contain;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        background: #f8f9fa;
+    }
+    .badge-promocion-grande {
+        font-size: 1.5rem;
+        padding: 10px 20px;
+    }
+    .precio-original-grande {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 1.5rem;
+    }
+    .precio-descuento-grande {
+        color: #dc3545;
+        font-weight: bold;
+        font-size: 2.5rem;
+    }
+    .precio-normal-grande {
+        color: #0d6efd;
+        font-weight: bold;
+        font-size: 2.5rem;
+    }
+    .producto-relacionado-img {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .producto-relacionado-card {
+        transition: transform 0.3s ease;
+    }
+    .producto-relacionado-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .stock-info {
+        font-size: 1.1rem;
+        padding: 15px;
+        border-radius: 8px;
+    }
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'catalogo' %}">Catálogo</a></li>
+            {% if producto.categoria %}
+            <li class="breadcrumb-item"><a href="{% url 'productos_categoria' producto.categoria.id %}">{{ producto.categoria.nombre }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ producto.nombre }}</li>
+        </ol>
+    </nav>
+
+    <!-- Detalle del Producto -->
+    <div class="row mb-5">
+        
+        <!-- Imagen del Producto -->
+        <div class="col-md-6 mb-4">
+            <div class="position-relative">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" class="producto-imagen-principal" alt="{{ producto.nombre }}">
+                {% else %}
+                    <img src="{% static 'images/no-image.jpg' %}" class="producto-imagen-principal" alt="Sin imagen">
+                {% endif %}
+                
+                <!-- Badge de Promoción -->
+                {% if producto.promocion and producto.promocion.esta_activa %}
+                <div class="position-absolute top-0 start-0 m-3">
+                    <span class="badge bg-success badge-promocion-grande">
+                        🔥 -{{ producto.promocion.descuento }}% OFF
+                    </span>
+                </div>
+                {% endif %}
+
+                <!-- Badge Destacado -->
+                {% if producto.destacado %}
+                <div class="position-absolute top-0 end-0 m-3">
+                    <span class="badge bg-warning text-dark badge-promocion-grande">
+                        ⭐ Destacado
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Información del Producto -->
+        <div class="col-md-6">
+            
+            <!-- Categoría -->
+            {% if producto.categoria %}
+            <p class="text-muted mb-2">
+                <a href="{% url 'productos_categoria' producto.categoria.id %}" class="text-decoration-none">
+                    📁 {{ producto.categoria.nombre }}
+                </a>
+            </p>
+            {% endif %}
+
+            <!-- Nombre -->
+            <h1 class="display-5 mb-3">{{ producto.nombre }}</h1>
+
+            <!-- Precio -->
+            <div class="mb-4">
+                {% if producto.promocion and producto.promocion.esta_activa %}
+                    <div class="precio-original-grande">${{ producto.precio|floatformat:2 }}</div>
+                    <div class="precio-descuento-grande">${{ producto.precio_con_promocion|floatformat:2 }}</div>
+                    <p class="text-success">
+                        💰 ¡Ahorras ${{ producto.precio|floatformat:2|add:"-"|add:producto.precio_con_promocion|floatformat:2 }}!
+                    </p>
+                    <p class="text-muted small">
+                        Promoción válida del {{ producto.promocion.fecha_inicio }} al {{ producto.promocion.fecha_fin }}
+                    </p>
+                {% else %}
+                    <div class="precio-normal-grande">${{ producto.precio|floatformat:2 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Stock -->
+            <div class="stock-info mb-4 {% if producto.stock == 0 %}bg-danger text-white{% elif producto.stock < 10 %}bg-warning{% else %}bg-success text-white{% endif %}">
+                {% if producto.stock == 0 %}
+                    <strong>❌ Producto agotado</strong>
+                    <p class="mb-0 small">No disponible en este momento</p>
+                {% elif producto.stock < 10 %}
+                    <strong>⚠️ ¡Últimas {{ producto.stock }} unidades!</strong>
+                    <p class="mb-0 small">Stock limitado - ¡No te lo pierdas!</p>
+                {% else %}
+                    <strong>✅ Disponible</strong>
+                    <p class="mb-0 small">{{ producto.stock }} unidades en stock</p>
+                {% endif %}
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-4">
+                <h4>Descripción</h4>
+                {% if producto.descripcion %}
+                    <p class="lead">{{ producto.descripcion }}</p>
+                {% else %}
+                    <p class="text-muted">Sin descripción disponible.</p>
+                {% endif %}
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">📋 Información del producto</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Código:</strong> #{{ producto.id }}</li>
+                        {% if producto.categoria %}
+                        <li><strong>Categoría:</strong> {{ producto.categoria.nombre }}</li>
+                        {% endif %}
+                        <li><strong>Disponibilidad:</strong> 
+                            {% if producto.tiene_stock %}
+                                <span class="text-success">En stock</span>
+                            {% else %}
+                                <span class="text-danger">Agotado</span>
+                            {% endif %}
+                        </li>
+                        <li><strong>Agregado:</strong> {{ producto.fecha_creacion|date:"d/m/Y" }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-grid gap-2">
+                {% if producto.tiene_stock %}
+                    <button class="btn btn-primary btn-lg" type="button">
+                        🛒 Agregar al carrito
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg" type="button">
+                        ❤️ Agregar a favoritos
+                    </button>
+                {% else %}
+                    <button class="btn btn-secondary btn-lg" type="button" disabled>
+                        Producto no disponible
+                    </button>
+                {% endif %}
+                <a href="{% url 'catalogo' %}" class="btn btn-outline-primary">
+                    ← Volver al catálogo
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Productos Relacionados -->
+    {% if productos_relacionados %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="mb-4">🔗 Productos Relacionados</h2>
+            <div class="row">
+                {% for relacionado in productos_relacionados %}
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card producto-relacionado-card h-100">
+                        <div class="position-relative">
+                            {% if relacionado.imagen %}
+                                <img src="{{ relacionado.imagen.url }}" class="card-img-top producto-relacionado-img" alt="{{ relacionado.nombre }}">
+                            {% else %}
+                                <img src="{% static 'images/no-image.jpg' %}" class="card-img-top producto-relacionado-img" alt="Sin imagen">
+                            {% endif %}
+                            
+                            {% if relacionado.promocion and relacionado.promocion.esta_activa %}
+                                <span class="badge bg-success position-absolute top-0 start-0 m-2">
+                                    -{{ relacionado.promocion.descuento }}%
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">{{ relacionado.nombre|truncatewords:5 }}</h6>
+                            <p class="card-text text-truncate small text-muted">
+                                {{ relacionado.descripcion|truncatewords:10 }}
+                            </p>
+                            <div class="mb-2">
+                                {% if relacionado.promocion and relacionado.promocion.esta_activa %}
+                                    <small class="text-decoration-line-through text-muted">
+                                        ${{ relacionado.precio|floatformat:2 }}
+                                    </small>
+                                    <h5 class="text-danger mb-0">
+                                        ${{ relacionado.precio_con_promocion|floatformat:2 }}
+                                    </h5>
+                                {% else %}
+                                    <h5 class="text-primary mb-0">
+                                        ${{ relacionado.precio|floatformat:2 }}
+                                    </h5>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'producto_detalle' relacionado.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                                Ver detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Aquí puedes agregar JavaScript para funcionalidad adicional
+    // Por ejemplo: agregar al carrito, zoom de imagen, etc.
+    
+    console.log('Producto ID: {{ producto.id }}');
+    console.log('Precio: ${{ producto.precio }}');
+    
+    // Ejemplo de botón agregar al carrito
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnAgregarCarrito = document.querySelector('.btn-primary.btn-lg');
+        if (btnAgregarCarrito) {
+            btnAgregarCarrito.addEventListener('click', function() {
+                alert('Funcionalidad de carrito próximamente');
+                // Aquí irá la lógica para agregar al carrito
+            });
+        }
+    });
+</script>
+{% endblock %}
