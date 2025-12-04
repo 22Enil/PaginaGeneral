@@ -57,11 +57,11 @@ class Migration(migrations.Migration):
             name='fecha_actualizacion',
             field=models.DateTimeField(auto_now=True),
         ),
-        migrations.AddField(
-            model_name='productos',
-            name='imagen',
-            field=models.ImageField(blank=True, null=True, upload_to=apps.my_web_pcwl.models.product_image_path),
-        ),
+        # migrations.AddField(
+        #     model_name='productos',
+        #     name='imagen',
+        #     field=models.ImageField(blank=True, null=True, upload_to=apps.my_web_pcwl.models.product_image_path),
+        # ),
         migrations.AddField(
             model_name='productos',
             name='categoria',
