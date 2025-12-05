@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Catálogo de Productos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .producto-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+    }
+    .producto-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .producto-img {
+        height: 250px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .badge-stock {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+    }
+    .badge-promocion {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+    }
+    .precio-original {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9rem;
+    }
+    .precio-descuento {
+        color: #dc3545;
+        font-weight: bold;
+        font-size: 1.3rem;
+    }
+    .categoria-sidebar {
+        position: sticky;
+        top: 20px;
+    }
+    .sin-stock {
+        opacity: 0.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                {% if categoria_actual %}
+                    {{ categoria_actual.nombre }}
+                {% else %}
+                    Catálogo de Productos
+                {% endif %}
+            </h1>
+            <p class="lead text-muted">
+                {% if categoria_actual %}
+                    {{ categoria_actual.descripcion }}
+                {% else %}
+                    Descubre nuestra selección de productos
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Productos Destacados (solo en vista general) -->
+    {% if productos_destacados and not categoria_actual %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3">⭐ Productos Destacados</h3>
+            <div class="row">
+                {% for producto in productos_destacados %}
+                <div class="col-md-3 mb-3">
+                    <div class="card producto-card border-warning">
+                        <div class="position-relative">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" class="card-img-top producto-img" alt="{{ producto.nombre }}">
+                            {% else %}
+                                <img src="{% static 'images/no-image.jpg' %}" class="card-img-top producto-img" alt="Sin imagen">
+                            {% endif %}
+                            <span class="badge bg-warning text-dark badge-stock">⭐ Destacado</span>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">{{ producto.nombre }}</h6>
+                            <p class="precio-descuento mb-0">${{ producto.precio|floatformat:2 }}</p>
+                            <a href="{% url 'producto_detalle' producto.pk %}" class="btn btn-sm btn-warning mt-2 w-100">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        
+        <!-- Sidebar de Filtros -->
+        <div class="col-md-3">
+            <div class="categoria-sidebar">
+                
+                <!-- Formulario de Búsqueda y Filtros -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">🔍 Buscar</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" action="{% url 'catalogo' %}">
+                            {{ form.busqueda }}
+                            <button type="submit" class="btn btn-primary w-100 mt-2">Buscar</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Categorías -->
+                <div class="card mb-3">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">📁 Categorías</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'catalogo' %}" class="list-group-item list-group-item-action {% if not categoria_actual %}active{% endif %}">
+                            Todas las categorías
+                        </a>
+                        {% for cat in categorias %}
+                        <a href="{% url 'productos_categoria' cat.id %}" class="list-group-item list-group-item-action {% if categoria_actual.id == cat.id %}active{% endif %}">
+                            {{ cat.nombre }} <span class="badge bg-secondary float-end">{{ cat.productos.count }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Filtros Adicionales -->
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">⚙️ Filtros</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get">
+                            <!-- Ordenar -->
+                            <div class="mb-3">
+                                <label class="form-label">Ordenar por:</label>
+                                {{ form.orden }}
+                            </div>
+
+                            <!-- Rango de Precios -->
+                            <div class="mb-3">
+                                <label class="form-label">Precio:</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        {{ form.precio_min }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ form.precio_max }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Checkboxes -->
+                            <div class="form-check mb-2">
+                                {{ form.en_stock }}
+                                <label class="form-check-label" for="{{ form.en_stock.id_for_label }}">
+                                    {{ form.en_stock.label }}
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                {{ form.destacados }}
+                                <label class="form-check-label" for="{{ form.destacados.id_for_label }}">
+                                    {{ form.destacados.label }}
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-info w-100">Aplicar filtros</button>
+                            <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary w-100 mt-2">Limpiar</a>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Lista de Productos -->
+        <div class="col-md-9">
+            
+            <!-- Información de Resultados -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="text-muted mb-0">
+                    Mostrando <strong>{{ productos|length }}</strong> de <strong>{{ total_productos }}</strong> productos
+                </p>
+            </div>
+
+            <!-- Grid de Productos -->
+            {% if productos %}
+            <div class="row">
+                {% for producto in productos %}
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="card producto-card {% if not producto.tiene_stock %}sin-stock{% endif %}">
+                        <div class="position-relative">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" class="card-img-top producto-img" alt="{{ producto.nombre }}">
+                            {% else %}
+                                <img src="{% static 'images/no-image.jpg' %}" class="card-img-top producto-img" alt="Sin imagen">
+                            {% endif %}
+                            
+                            <!-- Badge de Stock -->
+                            {% if producto.stock == 0 %}
+                                <span class="badge bg-danger badge-stock">Sin stock</span>
+                            {% elif producto.stock < 10 %}
+                                <span class="badge bg-warning text-dark badge-stock">Pocas unidades</span>
+                            {% endif %}
+
+                            <!-- Badge de Promoción -->
+                            {% if producto.promocion and producto.promocion.esta_activa %}
+                                <span class="badge bg-success badge-promocion">-{{ producto.promocion.descuento }}%</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">
+                                {% if producto.categoria %}
+                                    {{ producto.categoria.nombre }}
+                                {% else %}
+                                    Sin categoría
+                                {% endif %}
+                            </p>
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text text-truncate small">{{ producto.descripcion|truncatewords:15 }}</p>
+                            
+                            <!-- Precio -->
+                            <div class="mb-2">
+                                {% if producto.promocion and producto.promocion.esta_activa %}
+                                    <div class="precio-original">${{ producto.precio|floatformat:2 }}</div>
+                                    <div class="precio-descuento">${{ producto.precio_con_promocion|floatformat:2 }}</div>
+                                {% else %}
+                                    <h4 class="text-primary mb-0">${{ producto.precio|floatformat:2 }}</h4>
+                                {% endif %}
+                            </div>
+
+                            <!-- Botón -->
+                            <a href="{% url 'producto_detalle' producto.pk %}" class="btn btn-primary w-100">
+                                {% if producto.tiene_stock %}
+                                    Ver detalles
+                                {% else %}
+                                    Ver producto
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if productos.has_other_pages %}
+            <nav aria-label="Paginación de productos">
+                <ul class="pagination justify-content-center">
+                    {% if productos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ productos.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Página {{ productos.number }} de {{ productos.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if productos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ productos.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ productos.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Última</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="alert alert-info text-center">
+                <h4>No se encontraron productos</h4>
+                <p>No hay productos que coincidan con tu búsqueda. Intenta con otros filtros.</p>
+                <a href="{% url 'catalogo' %}" class="btn btn-primary">Ver todos los productos</a>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
