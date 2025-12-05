@@ -26,6 +26,7 @@ class Categoria(models.Model):
         return self.nombre
 
 # Modelo Producto → representa una tabla con los productos
+from django.db import models
 class Productos(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
