@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     
     #My app
     'apps.my_web_pcwl',
-    'catalogo',
 ]
 
 MIDDLEWARE = [
