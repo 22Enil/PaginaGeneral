@@ -88,8 +88,8 @@ class RegisterView(View):
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
-        username = request.POST.get("username")
-        email = request.POST.get("email")
+        username  = request.POST.get("username")
+        email     = request.POST.get("email")
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
 
@@ -101,10 +101,18 @@ class RegisterView(View):
             messages.error(request, "El usuario ya existe")
             return render(request, self.template_name)
 
-        user = User.objects.create_user(username=username, email=email, password=password1)
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password1
+        )
         user.save()
-        messages.success(request, "Usuario registrado con éxito. Ahora puedes iniciar sesión.")
+        messages.success(
+            request,
+            "Usuario registrado con éxito. Ahora puedes iniciar sesión."
+        )
         return redirect("login")
+
 
 #Logout - Finalizar session
 class LogoutView(View):
