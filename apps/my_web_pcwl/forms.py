@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from .models import PerfilUsuario
+from .models import PerfilUsuario, Productos, Categoria
 
 
 User = get_user_model()
@@ -59,10 +59,6 @@ class ProfileForm(forms.ModelForm):
         model = PerfilUsuario
         fields = ('phone_number', 'biografia', 'imagen_perfil')
 
-    # imagen_perfil uses the default ModelForm widget (ClearableFileInput).
-    # We avoid forcing a custom widget here to keep the default Django behavior
-    # (shows existing filename, clear checkbox, and change/select controls).
-
     def __init__(self, *args, **kwargs):
         # optionally receive a user argument to prefill
         user = kwargs.pop('user', None)
@@ -93,7 +89,6 @@ class ProfileForm(forms.ModelForm):
         perfil = super().save(commit=False)
         # update user fields if provided
         if user is not None:
-            # username and email are editable here as requested
             username = self.cleaned_data.get('username')
             email = self.cleaned_data.get('email')
             first = self.cleaned_data.get('first_name')
@@ -129,3 +124,131 @@ class ProfileForm(forms.ModelForm):
             raise ValidationError('El nombre de usuario ya está en uso por otra cuenta.')
 
         return username
+
+
+# ============================================
+# FORMULARIOS PARA EL CATÁLOGO
+# ============================================
+
+class ProductoFilterForm(forms.Form):
+    """Formulario para filtrar productos en el catálogo"""
+    busqueda = forms.CharField(
+        max_length=100, 
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Buscar productos...',
+            'aria-label': 'Buscar productos'
+        })
+    )
+    
+    categoria = forms.ModelChoiceField(
+        queryset=Categoria.objects.filter(activa=True),
+        required=False,
+        empty_label="Todas las categorías",
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
+    )
+    
+    ORDEN_CHOICES = [
+        ('', 'Ordenar por...'),
+        ('nombre', 'Nombre (A-Z)'),
+        ('-nombre', 'Nombre (Z-A)'),
+        ('precio', 'Precio (menor a mayor)'),
+        ('-precio', 'Precio (mayor a menor)'),
+        ('-fecha_creacion', 'Más recientes'),
+        ('fecha_creacion', 'Más antiguos'),
+    ]
+    
+    orden = forms.ChoiceField(
+        choices=ORDEN_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
+    )
+    
+    en_stock = forms.BooleanField(
+        required=False,
+        label='Solo con stock disponible',
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        })
+    )
+    
+    destacados = forms.BooleanField(
+        required=False,
+        label='Solo productos destacados',
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        })
+    )
+    
+    precio_min = forms.DecimalField(
+        required=False,
+        min_value=0,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Precio mínimo',
+            'step': '0.01'
+        })
+    )
+    
+    precio_max = forms.DecimalField(
+        required=False,
+        min_value=0,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Precio máximo',
+            'step': '0.01'
+        })
+    )
+
+
+class ProductoForm(forms.ModelForm):
+    """Formulario para crear/editar productos (si lo necesitas en el frontend)"""
+    
+    class Meta:
+        model = Productos
+        fields = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'categoria', 'destacado']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del producto'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Descripción del producto'
+            }),
+            'precio': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0'
+            }),
+            'stock': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0'
+            }),
+            'imagen': forms.ClearableFileInput(attrs={
+                'class': 'form-control'
+            }),
+            'categoria': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'destacado': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            })
+        }
+        labels = {
+            'nombre': 'Nombre',
+            'descripcion': 'Descripción',
+            'precio': 'Precio',
+            'stock': 'Stock disponible',
+            'imagen': 'Imagen del producto',
+            'categoria': 'Categoría',
+            'destacado': 'Producto destacado'
+        }
