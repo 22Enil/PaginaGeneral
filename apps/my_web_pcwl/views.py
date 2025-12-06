@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 
 from .models import PerfilUsuario, Productos, Categoria, Promocion
-from .forms import ProfileForm, ProductoFilterForm
+from .forms import ProfileForm, ProductoFilterForm, ContactoForm
 
 # Importas tus modelos y formularios juntos
 from .models import PerfilUsuario, Productos, Articulo 
@@ -124,12 +124,40 @@ class LogoutView(View):
     
 
 class ContactView(View):
-    template_name = "pcwl/contact.html"
+    template_name = "pcwl/natha_contacto.html"
 
     def get(self, request, *args, **kwargs):
-        context_html = {}
+        # Crear formulario vacío
+        form = ContactoForm()
+        context_html = {
+            'form': form
+        }
         return render(request, self.template_name, context_html)
 
+    def post(self, request, *args, **kwargs):
+        # Recibir datos del formulario
+        form = ContactoForm(request.POST)
+        
+        if form.is_valid():
+            # Se observa en consola
+            print("Nuevo mensaje de contacto recibido:")
+            print(f"De: {form.cleaned_data['nombre']} ({form.cleaned_data['correo']})")
+            print(f"Asunto: {form.cleaned_data['asunto']}")
+            
+            # Limpiar formulario
+            form = ContactoForm()
+            
+            context_html = {
+                'form': form,
+                'mensaje_exito': '¡Gracias! Tu mensaje ha sido enviado correctamente.'
+            }
+            return render(request, self.template_name, context_html)
+        
+        # Si el formulario no es válido, se devuelve con los errores
+        context_html = {
+            'form': form
+        }
+        return render(request, self.template_name, context_html)
 
 # ============================================
 # VISTAS DEL CATÁLOGO

@@ -1,11 +1,48 @@
 {% extends "base.html" %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Bienvenidos</title>
-</head>
-<body>
-  <h1>Bienvenidos</h1>
-</body>
-</html>
+
+{% load static %} {% block content %}
+
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-5">
+            <h2>Contáctanos</h2>
+            <p>Estamos aquí para resolver tus dudas.</p>
+            <hr>
+            <ul class="list-unstyled">
+                <li><strong>Dirección:</strong> Camino de La Arboleda 8, Sin Nombre, 58341 Morelos, Mich.</li>
+                <li><strong>Teléfono:</strong> +52 443 312 1570</li>
+                <li><strong>Email:</strong> contacto@tecnm.com</li>
+                <li><strong>Horario:</strong> Lun - Vie: 07:00 - 16:00</li>
+            </ul>
+            <div class="mt-4">
+                <img src="{% static 'imgs/ubicaciontec.png' %}" 
+                     alt="Ubicación del Tec de Morelia" 
+                     class="img-fluid border rounded shadow-sm">
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow p-4">
+                <h3 class="mb-3">Envíanos un mensaje</h3>
+                
+                {% if mensaje_exito %}
+                    <div class="alert alert-success">{{ mensaje_exito }}</div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    {{ form.as_p }}
+
+                    <div class="alert alert-light border mt-3 small">
+                        <strong>Nota de Privacidad:</strong> Sus datos no serán almacenados en nuestra base de datos; solo se enviarán por correo electrónico para atender su solicitud.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
